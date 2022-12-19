@@ -1,7 +1,7 @@
 from functools import partial
 from typing import List
 
-from qthandy import hbox, transparent, vbox, vspacer, margins
+from qthandy import hbox, transparent, vbox, vspacer, margins, line
 from qtpy.QtCore import Signal, QEvent, QObject
 from qtpy.QtGui import QIcon, QMouseEvent
 from qtpy.QtWidgets import QWidget, QToolButton, QLineEdit
@@ -65,6 +65,7 @@ class ToolBoxItem(QWidget):
             self._header.setIcon(icon)
 
         vbox(self)
+        self.layout().addWidget(line())
         self.layout().addWidget(self._header)
         self.layout().addWidget(self._center)
         self._header.selected.connect(self._center.setVisible)
@@ -86,6 +87,8 @@ class ToolBox(QWidget):
 
     def addItem(self, widget, title: str, icon: QIcon = None):
         item = ToolBoxItem(widget, title, icon)
+        if not self._items:
+            item.setSelected(True)
         self._items.append(item)
         item.header().selected.connect(partial(self._itemToggled, item))
         self.layout().insertWidget(self.layout().count() - 1, item)
