@@ -1,6 +1,6 @@
 import sys
 
-from PyQt6.QtWidgets import QApplication, QLabel
+from qtpy.QtWidgets import QApplication, QLabel
 from qtpy.QtWidgets import QMainWindow
 
 from qttoolbox import ToolBox
