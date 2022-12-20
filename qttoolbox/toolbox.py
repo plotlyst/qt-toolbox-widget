@@ -49,6 +49,9 @@ class ToolBoxHeader(QWidget):
         self.title.setReadOnly(False)
         self.title.setFocus()
 
+    def isSelected(self) -> bool:
+        return self._selected
+
     def setSelected(self, selected: bool):
         self._selected = selected
 
@@ -57,6 +60,7 @@ class ToolBoxItem(QWidget):
     def __init__(self, widget: QWidget, title: str, icon: QIcon = None, parent=None):
         super(ToolBoxItem, self).__init__(parent)
         self._header = ToolBoxHeader(title)
+        self._widget = widget
         self._center = QWidget()
         vbox(self._center, 0, 0).addWidget(widget)
         margins(self._center, left=4)
@@ -73,22 +77,44 @@ class ToolBoxItem(QWidget):
     def header(self) -> ToolBoxHeader:
         return self._header
 
+    def widget(self):
+        return self._widget
+
+    def isSelected(self) -> bool:
+        return self._header.isSelected()
+
     def setSelected(self, selected: bool):
         self._center.setVisible(selected)
         self._header.setSelected(selected)
 
 
 class ToolBox(QWidget):
+    currentChanged = Signal(int, QWidget)
+
     def __init__(self, parent=None):
         super(ToolBox, self).__init__(parent)
         vbox(self)
         self._items: List[ToolBoxItem] = []
         self.layout().addWidget(vspacer())
 
+    def count(self) -> int:
+        return len(self._items)
+
+    def currentIndex(self) -> int:
+        for i, item in enumerate(self._items):
+            if item.isSelected():
+                return i
+
+    def currentWidget(self):
+        for item in self._items:
+            if item.isSelected():
+                return item.widget()
+
     def addItem(self, widget, title: str, icon: QIcon = None):
         item = ToolBoxItem(widget, title, icon)
         if not self._items:
             item.setSelected(True)
+            self.currentChanged.emit(0, widget)
         self._items.append(item)
         item.header().selected.connect(partial(self._itemToggled, item))
         self.layout().insertWidget(self.layout().count() - 1, item)
@@ -97,3 +123,4 @@ class ToolBox(QWidget):
         for item in self._items:
             if item is not selectedItem:
                 item.setSelected(False)
+        self.currentChanged.emit(self._items.index(item), selectedItem.widget())

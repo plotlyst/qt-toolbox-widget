@@ -10,10 +10,11 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
 
-        self.widget = ToolBox(self)
-        self.setCentralWidget(self.widget)
-        self.widget.addItem(QLabel('Test 1'), 'Title 1')
-        self.widget.addItem(QLabel('Test 2'), 'Title 2')
+        self.toolbox = ToolBox(self)
+        self.toolbox.currentChanged.connect(lambda i, w: print(f'{i} {w}'))
+        self.setCentralWidget(self.toolbox)
+        self.toolbox.addItem(QLabel('Test 1'), 'Title 1')
+        self.toolbox.addItem(QLabel('Test 2'), 'Title 2')
 
 
 if __name__ == '__main__':
